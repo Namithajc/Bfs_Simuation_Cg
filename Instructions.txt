@@ -1,0 +1,3 @@
+Install Visual Studio
+-Install Open Gl libraries
+-Run the code

@@ -1,0 +1,605 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<GL/glut.h>
+#include<math.h>
+#include<string.h>
+#include<time.h>
+#define MAX 100
+
+#define initial 1
+#define waiting 2
+#define visited 3
+
+GLuint fontOffset;
+int adj[MAX][MAX];
+int state[MAX];
+int adj1[MAX][MAX];
+int state1[MAX];
+int reach[20];
+void create_graph();
+void BF_Traversal();
+void BFS(int v);
+int queue[MAX], front = -1, rear = -1;
+void insert_queue(int vertex);
+int delete_queue();
+int isEmpty_queue();
+int queue1[MAX], front1 = 0, rear1 = -1;
+void insert_queue1(int vertex);
+int delete_queue1();
+int isEmpty_queue1();
+int f = 0;
+
+int in;
+//Window Size
+GLsizei wh = 1020, ww = 1080;
+int size = 15;
+int s, s1;
+float PI = 3.14;
+float a[MAX];
+float b[MAX];
+int n;
+int  m = 0;
+int f2 = 0;
+int temp;
+float tempx1, tempx2;
+float tempy1, tempy2;
+int i, x, x1, x2;
+int flag = 0;
+int f1;
+int f3 = 0;
+int g = 0;
+int d = 0;
+int j;
+int xval = 400, yval = 600;
+char v[] = "Sequence:";
+char q[] = "Queue:";
+char p[20];
+int q2[20];
+char v1[20];
+char q1[20];
+
+
+void display_string(int x, int y, char *string)
+{
+	int len, i;
+	glRasterPos2f(x, y);
+	len = (int)strlen(string);
+	for (i = 0; i < len; i++)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
+	}
+}
+void wheel(int x, int y)
+{
+	float th, i;
+	glBegin(GL_LINE_LOOP);
+	for (i = 0; i <= 360; i++)
+	{
+		th = i * 3.14 / 180;
+		glVertex2f(x + 30 * cos(th), y + 30 * sin(th));
+	}
+	glEnd();
+	glFlush();
+}
+void drawCircle(float cx, float cy, float r, float num_segments)
+{
+	//theta- angle in radians of the point
+	float theta, x, y;
+
+	glBegin(GL_LINE_LOOP);
+
+	for (int i = 0; i < num_segments; i++)
+	{
+		//compute new angle and get the x, y coordinate
+		theta = 2.0 * PI * i / num_segments;
+		x = r * cosf(theta);
+		y = r * sinf(theta);
+
+		//draw the poin
+		glVertex2f(x + cx, y + cy);
+	}
+
+	glEnd();
+
+	//flush to output screen
+	glFlush();
+
+}
+void* fonts[] =
+{
+	GLUT_BITMAP_9_BY_15,
+	GLUT_BITMAP_TIMES_ROMAN_10,
+	GLUT_BITMAP_TIMES_ROMAN_24,
+	GLUT_BITMAP_HELVETICA_12,
+	GLUT_BITMAP_HELVETICA_10,
+	GLUT_BITMAP_HELVETICA_18,
+};
+
+void output(int x, int y, char* string, int j)
+{
+	int len, i;
+	glRasterPos2f(x, y);
+	len = (int)strlen(string);
+	for (i = 0; i < len; i++)
+		glutBitmapCharacter(fonts[j], string[i]);
+}
+
+void BF_Traversal()
+{
+	int v;
+
+	for (v = 0; v < n; v++)
+		state[v] = initial;
+
+	printf("Enter Start Vertex for BFS: \n");
+	scanf_s("%d", &s1);
+
+	s = s1;
+	BFS(s1);
+}
+
+
+void BFS(int s1)
+{
+	int i;
+
+	insert_queue(s1);
+	state[s1] = waiting;
+
+	while (!isEmpty_queue())
+	{
+		s1 = delete_queue();
+		printf("%d ", s1);
+		state[s1] = visited;
+
+		for (i = 0; i < n; i++)
+		{
+			if (adj[s1][i] == 1 && state[i] == initial)
+			{
+				insert_queue(i);
+				state[i] = waiting;
+			}
+		}
+	}
+	printf("\n");
+}
+void BFS1(int s)
+{
+	int i;
+
+	insert_queue(s1);
+	state[s1] = waiting;
+
+	while (!isEmpty_queue())
+	{
+		s1 = delete_queue();
+		printf("%d ", s1);
+		state[s1] = visited;
+
+		for (i = 0; i < n; i++)
+		{
+			if (adj[s1][i] == 1 && state[i] == initial)
+			{
+				insert_queue(i);
+				state[i] = waiting;
+			}
+		}
+	}
+	printf("\n");
+}
+
+
+void insert_queue(int vertex)
+{
+	if (rear == MAX - 1)
+		printf("Queue Overflow\n");
+	else
+	{
+		if (front == -1)
+			front = 0;
+		rear = rear + 1;
+		queue[rear] = vertex;
+	}
+}
+void insert_queue1(int vertex)
+{
+	if (rear == MAX - 1)
+		printf("Queue Overflow\n");
+	else
+	{
+		if (front1 == -1)
+			front1 = 0;
+		rear1 = rear1 + 1;
+		queue1[rear1] = vertex;
+		//q1[m] = (char)65 + vertex;
+	}
+}
+
+
+int isEmpty_queue()
+{
+	if (front == -1 || front > rear)
+		return 1;
+	else
+		return 0;
+}
+int isEmpty_queue1()
+{
+	if (front1 == -1 || front1 > rear1)
+		return 1;
+	else
+		return 0;
+}
+
+
+int delete_queue()
+{
+	int delete_item;
+	if (front == -1 || front > rear)
+	{
+		printf("Queue Underflow\n");
+		exit(1);
+	}
+
+	delete_item = queue[front];
+	front = front + 1;
+	return delete_item;
+}
+int delete_queue1()
+{
+	int delete_item;
+	if (front1 == -1 || front1 > rear1)
+	{
+		printf("Queue Underflow\n");
+		exit(1);
+	}
+
+	delete_item = queue1[front];
+	front1 = front1 + 1;
+	v1[delete_item] = '1';
+	return delete_item;
+}
+
+void arrow(int x1, int y1, int x2, int y2)
+{
+	glColor3f(1, 0, 0);
+	glPointSize(2);
+	glBegin(GL_LINE_STRIP);
+	glVertex2f(x1, y1);
+	glVertex2f(x2, y2);
+	glEnd();
+	glFlush();
+}
+
+void create_graph()
+{
+	int count, max_edge, origin, destin;
+	max_edge = n * (n - 1);
+
+	for (count = 1; count <= max_edge; count++)
+	{
+		printf("Enter edge %d( -1 -1 to quit ) : ", count);
+		scanf_s("%d %d", &origin, &destin);
+		if ((origin == -1) && (destin == -1))
+			break;
+
+		if (origin >= n || destin >= n || origin < 0 || destin < 0)
+		{
+			printf("Invalid edge!\n");
+			count--;
+		}
+		else
+		{
+			for (i = 0; i < n; i++)
+			{
+				if (i == origin) {
+					tempx1 = a[i];
+					tempy1 = b[i];
+				}
+				if (i == destin) {
+					tempx2 = a[i];
+					tempy2 = b[i];
+				}
+			}
+			arrow(tempx1, tempy1, tempx2, tempy2);
+			adj[origin][destin] = 1;
+		}
+	}
+	for (i = 0; i < n; i++)
+		state[i] = initial;
+	printf("Enter Start Vertex for BFS: \n");
+	scanf_s("%d", &s1);
+	s = s1;
+	temp = s1;
+	//insert_queue1(s);
+	insert_queue1(s1);
+	BFS(s1);
+	glFlush();
+}
+
+void writeDistance(char text, int x, int y)
+{
+	glColor3f(1.0, 1.0, 0.0);
+	glRasterPos2i(x, y);
+	glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, text);
+	glFlush();
+}
+
+
+void input()
+{
+	printf("Enter number of vertices : ");
+	scanf_s("%d", &n);
+	for (i = 0; i < n; i++) {
+		reach[i] = 0;
+		v1[i] = '0';
+	}
+	int count, max_edge, origin, destin;
+	max_edge = n * (n - 1);
+
+	for (count = 1; count <= max_edge; count++)
+	{
+		printf("Enter edge %d( -1 -1 to quit ) : ", count);
+		scanf_s("%d %d", &origin, &destin);
+
+		if ((origin == -1) && (destin == -1))
+			break;
+
+		if (origin >= n || destin >= n || origin < 0 || destin < 0)
+		{
+			printf("Invalid edge!\n");
+			count--;
+		}
+		else
+		{
+			for (i = 0; i < n; i++)
+			{
+				if (i == origin) {
+					tempx1 = a[i];
+					tempy1 = b[i];
+				}
+				if (i == destin) {
+					tempx2 = a[i];
+					tempy2 = b[i];
+				}
+			}
+			//arrow(tempx1, tempy1, tempx2, tempy2);
+			adj[origin][destin] = 1;
+		}
+	}
+	for (i = 0; i < n; i++)
+		state[i] = initial;
+	printf("Enter Start Vertex for BFS: \n");
+	scanf_s("%d", &s1);
+	tempx1 = a[s1];
+	tempx2 = b[s1];
+	s = s1;
+	BFS(s1);
+	f2 = 1;
+}
+void writeLabel(char text, int x, int y)
+{
+	glColor3f(1.0, 1.0, 0.0);
+	glRasterPos2i(x, y);
+	glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, text);
+
+}
+void key(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+	case 'S':
+	case 's':f = 1;
+		break;
+	case 'q':
+	case 'Q':
+		exit(0);
+	}
+	glutPostRedisplay();
+}
+
+void myReshape(GLsizei w, GLsizei h)
+{
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, w, 0, h);
+	//MatrixMode(GL_MODELVIEW);
+	glViewport(0, 0, w, h);
+	ww = w;
+	wh = h;
+}
+void myMouse(int btn, int state, int x, int y)
+{
+	if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		if (d < n)
+		{
+			f3 =0;
+			if (adj[s][d] && !reach[d])
+			{
+				queue1[++rear1] = d;
+				if (m == 0)
+				{
+					q2[m] = s1;
+					q1[m] = (char)65 + s1;
+					p[0] = (char)65 + s1;
+					m++;
+				}
+				for (i = 0; i < n; i++)
+				{
+					if (q2[i] != d)
+					{
+						f3 = 1;
+					}
+				}
+				if (f3 == 1)
+				{
+					q2[m] = d;
+					q1[m] = (char)65 + d;
+				}
+				p[0] = (char)65 + d;
+				m++;
+				if (d == 0)
+					temp = s;
+				else
+					temp = d;
+			}
+			d++;
+			if (d == n)
+			{
+				flag = 1;
+				d = 0;
+			}
+		}
+		if (front1 <= rear1 && flag == 1)
+		{
+			reach[front1] = 1;
+			s = ++front1;
+			flag = 0;
+		}
+		else
+			return;
+	}
+	glutPostRedisplay();
+}
+
+//window initilization
+void myInit()
+{
+	glClearColor(0.1, 0.1, 0.1, 1);
+	gluOrtho2D(0, ww, 0, wh);
+	glMatrixMode(GL_MODELVIEW);
+	glLineWidth(1);
+}
+void display()
+{
+	int xval = 400, yval = 600;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+	if (f == 0)
+	{
+		glClearColor(0.1, 0.1, 0.1, 1);
+		output(280, 925, (char*)"Demo", 2);
+		output(380, 850, (char*)"Demo", 2);
+		output(420, 775, (char*)"MINI PROJECT ", 2);
+		output(300, 700, (char*)"TOPIC : BREADTH FIRST SEARCH", 2);
+		glFlush();
+	}
+	else if (f == 1)
+	{
+		if (f2 == 0)
+		{
+			input();	
+		}
+		display_string(100, 900, v);
+		//display_string(200, 900, v1);
+		display_string(100, 800, q);
+		display_string(200, 800, q1);
+		display_string(220, 900, p);
+		x = xval;
+		x1 = xval - 70;
+		x2 = xval + 70;
+		for (i = 0; i < n; i++)
+		{
+			drawCircle(xval, yval, 20, 200);
+			//drawSquare(xval, yval);
+			a[i] = xval;
+			b[i] = yval;
+			writeLabel((char)65 + i, xval - 10, yval - 10);
+			if (i % 2 == 0) {
+				xval = x1;
+				yval = yval - 70;
+			}
+			else if (i % 2 != 0)
+			{
+				xval = x2;
+			}
+			else if (i == n - 2 && i % 2 == 0)
+			{
+				xval = x;
+				yval = yval - 70;
+			}
+		}
+		for (i = 0; i < n; i++)
+		{
+			for (j = 0; j < n; j++)
+			{
+				if (adj[i][j] == 1)
+				{
+					arrow(a[i], b[i], a[j], b[j]);
+				}
+			}
+		}
+		//if (f3 == 1) {
+			//temp = s;
+			wheel(a[temp], b[temp]);
+
+		//}
+		//else 
+			//wheel(a[temp], b[temp]);
+	}
+	glFlush();
+}
+int main(int argc, char **argv)
+{
+	glutInit(&argc, argv);
+	glutInitWindowSize(ww, wh);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutCreateWindow("Breadth First Search");
+	myInit();
+	glutReshapeFunc(myReshape);
+	glutDisplayFunc(display);
+	glutMouseFunc(myMouse);
+	glutKeyboardFunc(key);
+	/*printf("Enter number of vertices : ");
+	scanf_s("%d", &n);
+	for (i = 0; i < n; i++) {
+		reach[i] = 0;
+		v1[i] = '0';
+	}
+	int count, max_edge, origin, destin;
+	max_edge = n * (n - 1);
+
+	for (count = 1; count <= max_edge; count++)
+	{
+		printf("Enter edge %d( -1 -1 to quit ) : ", count);
+		scanf_s("%d %d", &origin, &destin);
+
+		if ((origin == -1) && (destin == -1))
+			break;
+
+		if (origin >= n || destin >= n || origin < 0 || destin < 0)
+		{
+			printf("Invalid edge!\n");
+			count--;
+		}
+		else
+		{
+			for (i = 0; i < n; i++)
+			{
+				if (i == origin) {
+					tempx1 = a[i];
+					tempy1 = b[i];
+				}
+				if (i == destin) {
+					tempx2 = a[i];
+					tempy2 = b[i];
+				}
+			}
+			//arrow(tempx1, tempy1, tempx2, tempy2);
+			adj[origin][destin] = 1;
+		}
+	}
+	for (i = 0; i < n; i++)
+		state[i] = initial;
+	printf("Enter Start Vertex for BFS: \n");
+	scanf_s("%d", &s1);
+	tempx1 = a[s1];
+	tempx2 = b[s1];
+	s = s1;
+	BFS(s1);
+	*/
+	glutMainLoop();
+
+	return 0;
+}
